@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1d17">
+<title>シカーダ星｜存在肯定証明書発行局</title>
+<style>
+  :root{
+    --forest:#0f2a22;
+    --deep:#07130f;
+    --gold:#c9a24b;
+    --gold-light:#e6d29a;
+    --gold-dim:#9c7a2b;
+    --paper:#f4ebd2;
+    --ink:#2b2a22;
+    --vermilion:#b3262e;
+    --jade:#a8dcc3;
+    --jade-dim:#6fb99b;
+    --serif:"Hiragino Mincho ProN","Hiragino Mincho Pro","Yu Mincho","YuMincho","Noto Serif JP","Source Han Serif JP","MS PMincho",serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:radial-gradient(ellipse 130% 80% at 50% 0%,#17392d 0%,var(--forest) 42%,var(--deep) 100%) fixed;
+    color:#e9efe9;
+    font-family:var(--serif);
+    line-height:1.8;
+    overflow-x:hidden;
+  }
+  /* 画面全体を囲む二重の金線（公文書の枠） */
+  body::before,body::after{
+    content:"";position:fixed;pointer-events:none;z-index:0;
+  }
+  body::before{inset:8px;border:1px solid rgba(201,162,75,.42)}
+  body::after{inset:13px;border:1px solid rgba(201,162,75,.16)}
+
+  .wrap{
+    position:relative;z-index:1;
+    max-width:560px;margin:0 auto;
+    padding:calc(34px + env(safe-area-inset-top)) 26px calc(40px + env(safe-area-inset-bottom));
+  }
+  .screen{display:none}
+  .screen.active{display:block;animation:fadeIn .7s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- ホーム ---------- */
+  #home.active{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    min-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  #emblem{width:164px;height:164px;display:block;margin:6px auto 4px}
+  .agency{
+    margin:6px 0 0;font-weight:700;color:var(--gold-light);
+    font-size:clamp(28px,9vw,40px);letter-spacing:.14em;line-height:1.35;
+    text-indent:.14em;
+  }
+  .actions .btn-secondary{margin-top:14px}
+  .agency-sub{
+    margin:4px 0 0;font-size:12px;letter-spacing:.34em;color:var(--jade-dim);
+    text-indent:.34em;font-family:"Helvetica Neue",Arial,var(--serif);
+  }
+  .rule{
+    display:flex;align-items:center;gap:12px;width:100%;max-width:300px;margin:26px auto;
+    color:var(--gold-dim);
+  }
+  .rule::before,.rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim))}
+  .rule::after{background:linear-gradient(270deg,transparent,var(--gold-dim))}
+  .rule i{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);display:block}
+  .motto{
+    margin:6px 0 4px;padding:0 4px;
+    font-size:clamp(16px,4.8vw,20px);line-height:2.1;letter-spacing:.08em;color:#f1ead3;
+    text-wrap:balance;
+  }
+  .actions{width:100%;max-width:380px;margin:26px auto 0}
+  .foot{
+    margin-top:auto;padding-top:34px;
+    font-size:13px;line-height:2;color:rgba(233,239,233,.7);letter-spacing:.06em;
+  }
+
+  /* ---------- ボタン ---------- */
+  .btn{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    width:100%;font-family:var(--serif);cursor:pointer;text-decoration:none;
+    border-radius:3px;transition:transform .12s ease,background .2s ease,opacity .2s;
+  }
+  .btn:active{transform:translateY(1px) scale(.995)}
+  .btn:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .btn small{font-size:11px;letter-spacing:.3em;font-weight:400;opacity:.75;margin-top:2px;text-indent:.3em;font-family:"Helvetica Neue",Arial,var(--serif)}
+  .btn-primary{
+    min-height:68px;margin:10px 0;
+    background:var(--jade);color:#0b1f18;border:1px solid var(--gold);
+    font-size:21px;font-weight:700;letter-spacing:.45em;text-indent:.45em;
+    box-shadow:0 0 0 4px var(--deep),0 0 0 5px rgba(201,162,75,.65);
+  }
+  .btn-primary:hover{background:#bde8d3}
+  .btn-secondary{
+    min-height:52px;margin:22px 0 0;background:transparent;color:var(--jade);
+    border:1px solid rgba(168,220,195,.45);font-size:15px;letter-spacing:.3em;text-indent:.3em;
+  }
+  .btn-secondary:hover{background:rgba(168,220,195,.09)}
+  .btn-text{
+    min-height:48px;margin:6px 0 0;background:none;border:0;color:rgba(168,220,195,.85);
+    font-size:14px;letter-spacing:.16em;text-decoration:underline;text-underline-offset:5px;text-decoration-color:rgba(168,220,195,.35);
+  }
+  .btn[disabled]{opacity:.4;cursor:default}
+
+  /* ---------- 共通見出し ---------- */
+  .head{text-align:center;margin-bottom:24px}
+  .head h1{margin:0;font-size:26px;letter-spacing:.3em;text-indent:.3em;color:var(--gold-light)}
+  .head p{margin:4px 0 0;font-size:11px;letter-spacing:.32em;color:var(--jade-dim);font-family:"Helvetica Neue",Arial,var(--serif)}
+
+  /* ---------- 申請 ---------- */
+  .panel{
+    border:1px solid rgba(201,162,75,.5);background:rgba(7,19,15,.5);
+    padding:22px 18px 20px;border-radius:3px;
+    box-shadow:inset 0 0 0 4px rgba(7,19,15,.7),inset 0 0 0 5px rgba(201,162,75,.18);
+  }
+  .field-label{display:block;margin:0 0 8px;font-size:14px;letter-spacing:.14em;color:var(--gold-light)}
+  .field-label span{color:var(--jade-dim);margin-right:.5em}
+  input[type=date]{
+    width:100%;min-height:54px;padding:10px 14px;border-radius:3px;
+    background:rgba(244,235,210,.07);color:#f1ead3;border:1px solid rgba(201,162,75,.6);
+    font-size:18px;font-family:var(--serif);color-scheme:dark;
+  }
+  .cicada-date{
+    margin:14px 0 26px;padding:10px 6px;text-align:center;
+    border-top:1px solid rgba(201,162,75,.4);border-bottom:1px solid rgba(201,162,75,.4);
+    color:var(--gold);
+  }
+  .cicada-date .k{display:block;font-size:11px;letter-spacing:.3em;color:var(--gold-dim);text-indent:.3em}
+  .cicada-date .v{display:block;font-size:clamp(19px,5.6vw,23px);letter-spacing:.08em;font-weight:700;margin-top:2px}
+  textarea{
+    width:100%;min-height:210px;padding:16px;border-radius:3px;resize:vertical;
+    background:var(--paper);color:var(--ink);border:1px solid var(--gold-dim);
+    font-size:17px;line-height:1.95;font-family:var(--serif);
+    box-shadow:inset 0 2px 8px rgba(90,60,20,.14);
+  }
+  textarea::placeholder{color:#8e866a}
+  .count{text-align:right;font-size:12px;color:rgba(233,239,233,.5);margin-top:6px;letter-spacing:.08em}
+  .err{
+    margin:16px 0 0;padding:11px 14px;font-size:14px;line-height:1.8;
+    color:#f0d9a8;background:rgba(224,184,114,.09);border-left:3px solid #d9b46a;
+  }
+  .err[hidden]{display:none}
+  .submit-wrap{margin-top:24px}
+
+  /* ---------- 当局について ---------- */
+  .about h2{
+    margin:30px 0 8px;font-size:17px;letter-spacing:.2em;color:var(--gold-light);font-weight:700;
+    display:flex;align-items:center;gap:10px;
+  }
+  .about h2:first-of-type{margin-top:0}
+  .about h2::before{content:"";width:7px;height:7px;background:var(--gold);transform:rotate(45deg);flex:none}
+  .about p{margin:0 0 12px;font-size:15px;line-height:2;color:rgba(241,234,211,.92);letter-spacing:.04em}
+  .facts{margin:0 0 6px;border-top:1px solid rgba(201,162,75,.35)}
+  .facts div{display:flex;gap:14px;padding:10px 2px;border-bottom:1px solid rgba(201,162,75,.2);font-size:14px;line-height:1.8}
+  .facts dt{flex:0 0 5.6em;color:var(--gold);letter-spacing:.1em}
+  .facts dd{margin:0;color:rgba(241,234,211,.92)}
+  .about .creed{
+    margin:18px 0 4px;padding:16px 8px;text-align:center;font-size:clamp(17px,5vw,20px);line-height:2.1;
+    color:var(--gold-light);border-top:1px solid rgba(201,162,75,.4);border-bottom:1px solid rgba(201,162,75,.4);
+  }
+
+  /* ---------- 結果 ---------- */
+  .status{min-height:76px;text-align:center;margin:0 0 16px}
+  .status .main{font-size:clamp(19px,5.6vw,23px);letter-spacing:.14em;color:var(--jade);font-weight:700}
+  .status .sub{font-size:13px;color:rgba(233,239,233,.7);letter-spacing:.06em;margin-top:4px}
+  #certWrap{opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s ease}
+  #certWrap.show{opacity:1;transform:none}
+  #certWrap.thud{animation:thud .18s ease-out}
+  @keyframes thud{0%{transform:translateY(0)}35%{transform:translateY(3px)}70%{transform:translateY(-1px)}100%{transform:translateY(0)}}
+  #cert{display:block;width:100%;height:auto;max-width:100%;box-shadow:0 12px 44px rgba(0,0,0,.6),0 0 0 1px rgba(201,162,75,.25)}
+  .after{margin-top:22px}
+  .after[hidden]{display:none}
+
+  @media (prefers-reduced-motion:reduce){
+    .screen.active{animation:none}
+    #certWrap{transition:none;transform:none}
+    #certWrap.thud{animation:none}
+    .btn{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ホーム -->
+  <section id="home" class="screen active" aria-labelledby="homeTitle">
+    <canvas id="emblem" width="164" height="164" role="img" aria-label="シカーダ星の星章"></canvas>
+    <h1 class="agency" id="homeTitle">存在肯定<br>証明書発行局</h1>
+    <p class="agency-sub">CICADA STAR ／ シカーダ星</p>
+
+    <div class="rule" aria-hidden="true"><i></i></div>
+
+    <p class="motto">あなたの存在は、<br>あなたの成果で<br>証明するものではありません。</p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="goApply" type="button">発行申請<small>APPLICATION</small></button>
+      <button class="btn btn-secondary" id="goAbout" type="button">当局について</button>
+      <a class="btn btn-secondary" id="xLink" href="#" target="_blank" rel="noopener noreferrer">通信</a>
+    </div>
+
+    <p class="foot">ようこそ、地球人の皆サマ。<br>何気ない一日も、うまくいかなかった一日も、<br>そのまま受け付けていマス。</p>
+  </section>
+
+  <!-- 当局について -->
+  <section id="about" class="screen" aria-labelledby="aboutTitle">
+    <div class="head">
+      <h1 id="aboutTitle">当局について</h1>
+      <p>ABOUT THE BUREAU</p>
+    </div>
+    <div class="panel about">
+      <h2>シカーダ星</h2>
+      <dl class="facts">
+        <div><dt>名称</dt><dd>シカーダ星（CICADA STAR）</dd></div>
+        <div><dt>住民</dt><dd>シカーダ星人。地球のセミに相当する生物を起源とする</dd></div>
+        <div><dt>交流</dt><dd>ゼド星系との往来が深い</dd></div>
+        <div><dt>幼体期</dt><dd>約7年</dd></div>
+        <div><dt>成体期</dt><dd>約7日間（地球時間）</dd></div>
+        <div><dt>暦</dt><dd>シカーダ星歴</dd></div>
+      </dl>
+
+      <h2>生態</h2>
+      <p>シカーダ星人は、卵から孵化し、脱皮を重ねて成体となる生命です。孵化後は、腐葉土を基盤とした専用の育成ポッドで育ち、約7年をかけて身体を発達させます。必要に応じて外気のもとで活動することもできます。</p>
+      <p>最後の脱皮を経て成体となったのち、活動できる期間は地球時間でおよそ7日間です。</p>
+
+      <h2>人生のとらえ方</h2>
+      <p>シカーダ星人にとって、約7日間は生涯の長さではありません。卵の時間も、ポッドで過ごした長い年月も、成体として過ごす短い日々も、すべてがひとつの人生を構成しています。</p>
+      <p>そのため、この星では、成果や結果だけで生命の価値を測りません。何気ない会話も、いつもどおりの食事も、思うようにいかなかった一日も、その個体が生きた時間として等しく尊重されます。</p>
+
+      <h2>存在の記録</h2>
+      <p>シカーダ星では、個体が過ごした時間や経験を記録する文化が古くから根づいています。記録は、優劣をつけるための評価表ではなく、その個体が確かにそこにいたことを受け止めるためのものです。大きな成果を残した者だけが記録されることはありません。</p>
+
+      <h2>存在肯定証明書発行局</h2>
+      <p>当局は、この思想を公的な仕組みとして担う機関です。申請された出来事を記録し、その日を生きた事実を証明書として発行します。出来事の正しさや価値を審査することはありません。</p>
+      <p>肯定の対象は、成果や評価とは切り離された「存在そのもの」です。反省することも、失敗から学ぶことも妨げません。ただ、うまくいかなかったからといって、その人の存在まで否定する必要はないと、当局は考えます。</p>
+
+      <h2>シカーダ星歴</h2>
+      <p>当局が発行する証明書には、シカーダ星歴を併記します。地球の年・月・日の数値をそれぞれ7倍した表記で、たとえば地球暦の2026年10月30日は、シカーダ星歴14182年70月210日にあたります。</p>
+
+      <p class="creed">あなたの存在を、<br>あなたの成果で<br>証明する必要はありません。</p>
+    </div>
+    <div class="submit-wrap">
+      <button class="btn btn-primary" id="aboutApply" type="button">発行申請へ</button>
+      <button class="btn btn-text" id="backHome3" type="button">ホームへ戻る</button>
+    </div>
+  </section>
+
+  <!-- 申請 -->
+  <section id="apply" class="screen" aria-labelledby="applyTitle">
+    <div class="head">
+      <h1 id="applyTitle">発行申請</h1>
+      <p>APPLICATION FORM</p>
+    </div>
+    <div class="panel">
+      <label class="field-label" for="date"><span>第一項</span>日付（地球暦）</label>
+      <input type="date" id="date">
+      <div class="cicada-date" aria-live="polite">
+        <span class="k">シカーダ星歴</span>
+        <span class="v" id="calPreview">―</span>
+      </div>
+
+      <label class="field-label" for="event"><span>第二項</span>今日の出来事</label>
+      <textarea id="event" maxlength="300" placeholder="記録しておきたいことを、自由に。&#10;何もなかった日も、うまくいかなかった日も、ひとことで大丈夫です。"></textarea>
+      <div class="count"><span id="cnt">0</span> / 300</div>
+
+      <p class="err" id="err" role="alert" hidden></p>
+    </div>
+    <div class="submit-wrap">
+      <button class="btn btn-primary" id="submit" type="button">申請<small>公印の押印を申請する</small></button>
+      <button class="btn btn-text" id="backHome1" type="button">ホームへ戻る</button>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section id="result" class="screen" aria-labelledby="statusMain">
+    <div class="status" aria-live="polite">
+      <div class="main" id="statusMain"></div>
+      <div class="sub" id="statusSub"></div>
+    </div>
+    <div id="certWrap"><canvas id="cert" role="img" aria-label="発行された存在肯定証明書"></canvas></div>
+    <div class="after" id="after" hidden>
+      <button class="btn btn-primary" id="save" type="button">画像として保存<small>SAVE AS PNG</small></button>
+      <button class="btn btn-secondary" id="again" type="button" style="margin-top:14px">もう一枚申請する</button>
+      <button class="btn btn-text" id="backHome2" type="button">ホームへ戻る</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   設定値
+   ========================================================= */
+// 地球観測員ヒマジンのXアカウントURL（必要に応じてここだけ書き換えてください）
+const X_URL = "https://x.com/";
+
+// 証明書（保存画像）側の描画設定
+const W = 1080;                 // 証明書の論理幅
+const MAX_AREA = 14e6;          // Canvas面積の上限（モバイルのメモリ対策）
+const FONT = '"Hiragino Mincho ProN","Hiragino Mincho Pro","Yu Mincho","YuMincho","Noto Serif JP","Source Han Serif JP","MS PMincho",serif';
+const COL = {
+  ink:'#2b2a22', inkSoft:'#6b5a2e', gold:'#c9a24b', goldDim:'#9c7a2b', goldDeep:'#8a6a22', seal:'#b3262e'
+};
+const MAX_LEN = 300;
+
+/* =========================================================
+   小さなユーティリティ
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function hashHex(s){
+  let h = 2166136261;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h,16777619); }
+  return (h>>>0).toString(16).toUpperCase().padStart(8,'0');
+}
+
+/* =========================================================
+   シカーダ星歴（地球暦の年・月・日を各7倍）※換算ルールは不変
+   ========================================================= */
+function parseDate(v){ const [y,m,d] = v.split('-').map(Number); return {y,m,d}; }
+function toCicada(y,m,d){ return {y:y*7, m:m*7, d:d*7}; }
+function cicadaText(v){
+  const {y,m,d} = parseDate(v), c = toCicada(y,m,d);
+  return `シカーダ星歴${c.y}年${c.m}月${c.d}日`;
+}
+function cicadaShort(v){
+  const {y,m,d} = parseDate(v), c = toCicada(y,m,d);
+  return `${c.y}年${c.m}月${c.d}日`;
+}
+
+/* =========================================================
+   星章（7回対称の幾何学紋章）。ホーム・証明書・公印で共用
+   ========================================================= */
+function circle(ctx,r){ ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.stroke(); }
+function drawEmblem(ctx,cx,cy,r,color,lw){
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.strokeStyle = color; ctx.fillStyle = color;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+
+  // 外周の二重円
+  ctx.lineWidth = lw*1.5; circle(ctx,r);
+  ctx.lineWidth = lw*0.6; circle(ctx,r*0.9);
+
+  // 外周の小さな刻み（7×4=28）
+  ctx.lineWidth = lw*0.55;
+  for(let i=0;i<28;i++){
+    const a = i*Math.PI*2/28;
+    const r1 = r*0.9, r2 = r*(i%4===0 ? 0.8 : 0.85);
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*r1, Math.sin(a)*r1);
+    ctx.lineTo(Math.cos(a)*r2, Math.sin(a)*r2);
+    ctx.stroke();
+  }
+
+  // 七芒星 {7/3}
+  const R = r*0.76, pts = [];
+  for(let i=0;i<7;i++){
+    const a = -Math.PI/2 + i*Math.PI*2/7;
+    pts.push([Math.cos(a)*R, Math.sin(a)*R]);
+  }
+  ctx.lineWidth = lw*0.8;
+  ctx.beginPath();
+  for(let i=0;i<7;i++){
+    const p = pts[(i*3)%7];
+    if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]);
+  }
+  ctx.closePath(); ctx.stroke();
+
+  // 頂点の小円
+  pts.forEach(p=>{ ctx.beginPath(); ctx.arc(p[0],p[1],r*0.045,0,Math.PI*2); ctx.fill(); });
+
+  // 内側の円と放射線
+  ctx.lineWidth = lw*0.7; circle(ctx,r*0.33);
+  ctx.lineWidth = lw*0.6;
+  for(let i=0;i<7;i++){
+    const a = -Math.PI/2 + i*Math.PI*2/7;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*r*0.13, Math.sin(a)*r*0.13);
+    ctx.lineTo(Math.cos(a)*r*0.3,  Math.sin(a)*r*0.3);
+    ctx.stroke();
+  }
+  // 中心（羽を思わせる菱形）
+  ctx.beginPath();
+  ctx.moveTo(0,-r*0.1); ctx.lineTo(r*0.055,0); ctx.lineTo(0,r*0.1); ctx.lineTo(-r*0.055,0); ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawHomeEmblem(){
+  const c = $('emblem'), ctx = c.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 3), size = 164;
+  c.width = size*dpr; c.height = size*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,size,size);
+  drawEmblem(ctx,size/2,size/2,size/2-8,'#c9a24b',1.8);
+}
+
+/* =========================================================
+   画面切替 / 実行中演出の取消管理
+   ========================================================= */
+let runId = 0;
+function show(id){
+  runId++;                                    // 進行中の演出を無効化
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+$('xLink').href = X_URL;
+$('goApply').onclick = ()=>show('apply');
+$('goAbout').onclick = ()=>show('about');
+$('aboutApply').onclick = ()=>show('apply');
+$('backHome1').onclick = $('backHome2').onclick = $('backHome3').onclick = ()=>show('home');
+$('again').onclick = ()=>show('apply');
+
+/* =========================================================
+   申請フォーム
+   ========================================================= */
+function todayStr(){
+  const n = new Date(), p = x=>String(x).padStart(2,'0');
+  return `${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`;
+}
+$('date').value = todayStr();
+function updatePreview(){
+  const v = $('date').value;
+  $('calPreview').textContent = v ? cicadaShort(v) : '―';
+}
+$('date').addEventListener('input', updatePreview);
+$('date').addEventListener('change', updatePreview);
+updatePreview();
+$('event').addEventListener('input', ()=>{ $('cnt').textContent = $('event').value.length; });
+
+function showError(msg, focusEl){
+  const e = $('err');
+  e.textContent = msg; e.hidden = false;
+  if(focusEl) focusEl.focus();
+}
+function clearError(){ $('err').hidden = true; $('err').textContent = ''; }
+$('date').addEventListener('input', clearError);
+$('event').addEventListener('input', clearError);
+
+/* =========================================================
+   証明書：文章の折り返し（禁則処理つき）
+   ========================================================= */
+const NO_START = new Set('、。，．,.！？!?）)」』】〕》〉：；:;'.split(''));
+function wrapText(ctx,text,maxW){
+  const out = [];
+  text.split('\n').forEach(par=>{
+    if(par===''){ out.push(''); return; }
+    let cur = '';
+    for(const ch of par){
+      if(cur){
+        const w = ctx.measureText(cur+ch).width;
+        const hang = NO_START.has(ch) && w <= maxW + 36;     // 句読点のぶら下げ（少しだけ許容）
+        if(w > maxW && !hang){ out.push(cur); cur = ch; continue; }
+      }
+      cur += ch;
+    }
+    out.push(cur);
+  });
+  return out;
+}
+function normalizeText(t){
+  return t.replace(/\r\n?/g,'\n').replace(/\t/g,'  ').replace(/\n{3,}/g,'\n\n').trim();
+}
+
+/* 文字間隔つき中央揃え（ctx.letterSpacing 非対応環境でも同じ見た目にするため自前で実装） */
+function spaced(ctx,text,cx,y,sp){
+  const chars = [...text];
+  const ws = chars.map(ch=>ctx.measureText(ch).width);
+  const total = ws.reduce((a,b)=>a+b,0) + sp*(chars.length-1);
+  const prev = ctx.textAlign;
+  ctx.textAlign = 'left';
+  let x = cx - total/2;
+  chars.forEach((ch,i)=>{ ctx.fillText(ch,x,y); x += ws[i]+sp; });
+  ctx.textAlign = prev;
+}
+/* 幅に収まるまでフォントを縮める */
+function fitFont(ctx,text,weight,size,maxW,sp=0){
+  let s = size;
+  for(;;){
+    ctx.font = `${weight} ${s}px ${FONT}`;
+    const w = [...text].reduce((a,ch)=>a+ctx.measureText(ch).width,0) + sp*([...text].length-1);
+    if(w <= maxW || s <= 20) return s;
+    s -= 2;
+  }
+}
+
+/* =========================================================
+   証明書：レイアウト計算（文章量に応じて高さを動的に決定）
+   ========================================================= */
+const BOX_X = 130, BOX_W = W - 260, BOX_PAD = 40;
+const LINE_H = 56, BLANK_H = 28;
+const NOTICE_ITEMS = [
+  '本証明書は、ありのままの出来事を記録し、対象の存在を前向きに後押しするものである。',
+  '肯定の対象は存在そのものであり、行動を正当化するものではない。犯罪その他の違法・不当な行為を、肯定・容認・推奨するものではない。',
+  '犯罪など法的な判断に関する事項は、当該惑星における現地の法令に準ずる。'
+];
+
+function prepare(dateStr,text){
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = `34px ${FONT}`;
+  const clean = normalizeText(text);
+  const lines = wrapText(m, clean, BOX_W - BOX_PAD*2);
+
+  const hex = hashHex(`${dateStr}|${clean}|${Date.now()}|${Math.random()}`);
+  const s = {
+    dateStr, text:clean, lines,
+    no:`CIC-${hex.slice(0,4)}-${hex.slice(4)}`,
+    seed:parseInt(hex,16) >>> 0
+  };
+
+  const y = {};
+  y.emblem = 168;
+  y.agency = 282;
+  y.agencySub = 322;
+  y.title = 452;
+  y.rule = 498;
+  y.no = 548;
+  y.cDate = 640;
+  y.eDate = 688;
+  y.decl1 = 776;
+  y.decl2 = 820;
+  y.label = 886;
+  y.boxTop = 912;
+
+  // 出来事の各行のベースライン位置
+  let cursor = y.boxTop + 46;
+  s.rows = lines.map(t=>{
+    if(t===''){ cursor += BLANK_H; return null; }
+    const row = {t, y:cursor + 38};
+    cursor += LINE_H;
+    return row;
+  }).filter(Boolean);
+  y.boxBottom = cursor + 26;
+
+  y.philRule = y.boxBottom + 70;
+  y.phil1 = y.philRule + 68;
+  y.phil2 = y.phil1 + 50;
+  y.note  = y.phil2 + 58;
+  // 注意書き（現地法令・正当化に関する但し書き）
+  m.font = `21px ${FONT}`;
+  y.noticeTop = y.note + 44;
+  y.noticeHead = y.noticeTop + 42;
+  y.noticeText = y.noticeHead + 46;
+  let ny = 0;
+  s.noticeRows = [];
+  NOTICE_ITEMS.forEach((it,k)=>{
+    wrapText(m, it, BOX_W - 60 - 36).forEach((ln,i)=>{
+      s.noticeRows.push({t:ln, off:ny, mark:i===0 ? `${k+1}.` : null});
+      ny += 36;
+    });
+    ny += 12;
+  });
+  y.noticeBottom = y.noticeText + (ny - 12 - 36) + 30;
+  y.footer = y.noticeBottom + 56;
+  y.sealCy = y.footer + 140;
+  s.sealX = W - 250;
+  s.sealY = y.sealCy;
+
+  s.H = Math.ceil(y.sealCy + 100 + 60 + 58);   // 公印下端 + 余白 + 内枠
+  s.y = y;
+  s.S = Math.max(0.6, Math.min(2, Math.sqrt(MAX_AREA / (W * s.H))));
+  return s;
+}
+
+/* =========================================================
+   証明書：紙面（質感）
+   ========================================================= */
+function paintPaper(ctx,H,seed){
+  const rand = mulberry32(seed);
+  ctx.fillStyle = '#f4ebd2';
+  ctx.fillRect(0,0,W,H);
+
+  // やわらかい濃淡のムラ
+  for(let i=0;i<16;i++){
+    const x = rand()*W, y = rand()*H, r = 160 + rand()*340;
+    const g = ctx.createRadialGradient(x,y,0,x,y,r);
+    const warm = rand()>0.5;
+    const a = 0.035 + rand()*0.05;
+    g.addColorStop(0, warm ? `rgba(196,150,78,${a})` : `rgba(255,252,240,${a*1.6})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  }
+  // 紙の粒
+  const grains = Math.floor(W*H/80);
+  for(let i=0;i<grains;i++){
+    const light = rand()>0.62;
+    ctx.fillStyle = light ? `rgba(255,255,255,${0.05+rand()*0.1})` : `rgba(120,88,40,${0.02+rand()*0.055})`;
+    ctx.fillRect(rand()*W, rand()*H, 1+(rand()>0.8?1:0), 1);
+  }
+  // 繊維
+  ctx.lineWidth = 0.6;
+  const fibers = Math.floor(W*H/9000);
+  for(let i=0;i<fibers;i++){
+    const x = rand()*W, y = rand()*H, a = rand()*Math.PI*2, l = 6 + rand()*16;
+    ctx.strokeStyle = `rgba(140,108,58,${0.04+rand()*0.06})`;
+    ctx.beginPath(); ctx.moveTo(x,y);
+    ctx.quadraticCurveTo(x+Math.cos(a)*l*0.5+rand()*3, y+Math.sin(a)*l*0.5+rand()*3, x+Math.cos(a)*l, y+Math.sin(a)*l);
+    ctx.stroke();
+  }
+  // 周縁の自然な陰影
+  const v = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3,W/2,H/2,Math.hypot(W,H)*0.55);
+  v.addColorStop(0,'rgba(120,84,30,0)');
+  v.addColorStop(1,'rgba(120,84,30,0.2)');
+  ctx.fillStyle = v; ctx.fillRect(0,0,W,H);
+}
+
+/* =========================================================
+   証明書：金の二重枠と四隅の装飾
+   ========================================================= */
+function drawCorner(ctx,x,y,rot){
+  ctx.save();
+  ctx.translate(x,y); ctx.rotate(rot);
+  ctx.strokeStyle = COL.goldDim; ctx.fillStyle = COL.goldDim;
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 2.4;
+  ctx.beginPath(); ctx.arc(0,0,40,0,Math.PI/2); ctx.stroke();
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(0,0,56,0,Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0,0,24,0,Math.PI/2); ctx.stroke();
+  // 斜めの菱形
+  const d = 28, k = 8;
+  ctx.beginPath();
+  ctx.moveTo(d,d-k); ctx.lineTo(d+k,d); ctx.lineTo(d,d+k); ctx.lineTo(d-k,d); ctx.closePath();
+  ctx.fill();
+  // 枠に沿う小さな点
+  [74,92].forEach(p=>{
+    ctx.beginPath(); ctx.arc(p,0,2.6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,p,2.6,0,Math.PI*2); ctx.fill();
+  });
+  ctx.restore();
+}
+function drawFrame(ctx,H){
+  ctx.strokeStyle = COL.goldDim; ctx.lineWidth = 7;
+  ctx.strokeRect(38,38,W-76,H-76);
+  ctx.strokeStyle = COL.gold; ctx.lineWidth = 2.5;
+  ctx.strokeRect(58,58,W-116,H-116);
+  drawCorner(ctx,58,58,0);
+  drawCorner(ctx,W-58,58,Math.PI/2);
+  drawCorner(ctx,W-58,H-58,Math.PI);
+  drawCorner(ctx,58,H-58,-Math.PI/2);
+}
+
+/* 区切り線（中央に菱形） */
+function drawDivider(ctx,y,half){
+  ctx.save();
+  ctx.strokeStyle = COL.goldDim; ctx.fillStyle = COL.goldDim; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(W/2-half,y); ctx.lineTo(W/2-16,y); ctx.moveTo(W/2+16,y); ctx.lineTo(W/2+half,y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W/2,y-7); ctx.lineTo(W/2+7,y); ctx.lineTo(W/2,y+7); ctx.lineTo(W/2-7,y); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+/* =========================================================
+   証明書：本文の描画（公印を除く静的レイヤー）
+   ========================================================= */
+function drawContent(ctx,s){
+  const y = s.y;
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'center';
+
+  // 1. 発行局の名称と星章
+  drawEmblem(ctx,W/2,y.emblem,66,COL.goldDeep,2);
+  ctx.fillStyle = COL.ink;
+  ctx.font = `bold 30px ${FONT}`;
+  spaced(ctx,'シカーダ星　存在肯定証明書発行局',W/2,y.agency,6);
+  ctx.fillStyle = COL.inkSoft;
+  ctx.font = `18px "Helvetica Neue",Arial,${FONT}`;
+  spaced(ctx,'CICADA STAR ／ シカーダ星',W/2,y.agencySub,6);
+
+  // 2. タイトル
+  ctx.fillStyle = COL.ink;
+  const tsp = 16;
+  fitFont(ctx,'存在肯定証明書','bold',100,W-300,tsp);
+  spaced(ctx,'存在肯定証明書',W/2,y.title,tsp);
+  drawDivider(ctx,y.rule,300);
+
+  // 3. 証明書番号
+  ctx.fillStyle = COL.inkSoft;
+  ctx.font = `24px ${FONT}`;
+  spaced(ctx,`証明書番号　${s.no}`,W/2,y.no,3);
+
+  // 4. シカーダ星歴と地球暦
+  ctx.fillStyle = COL.ink;
+  const ct = cicadaText(s.dateStr);
+  fitFont(ctx,ct,'bold',48,W-260);
+  ctx.fillText(ct,W/2,y.cDate);
+  const {y:ey,m:em,d:ed} = parseDate(s.dateStr);
+  ctx.fillStyle = COL.inkSoft;
+  ctx.font = `25px ${FONT}`;
+  ctx.fillText(`（地球暦　${ey}年${em}月${ed}日）`,W/2,y.eDate);
+
+  // 5. 宣言文
+  ctx.fillStyle = COL.ink;
+  ctx.font = `29px ${FONT}`;
+  ctx.fillText('上記の日に、以下の出来事があったことを記録し、',W/2,y.decl1);
+  ctx.fillText('この日を生きた事実を、ここに肯定する。',W/2,y.decl2);
+
+  // 6. 申請者が記録した出来事
+  ctx.fillStyle = COL.goldDeep;
+  ctx.font = `bold 22px ${FONT}`;
+  spaced(ctx,'記録された出来事',W/2,y.label,8);
+  const bh = y.boxBottom - y.boxTop;
+  ctx.fillStyle = 'rgba(255,252,240,0.6)';
+  ctx.fillRect(BOX_X,y.boxTop,BOX_W,bh);
+  ctx.strokeStyle = COL.goldDim; ctx.lineWidth = 1.6;
+  ctx.strokeRect(BOX_X,y.boxTop,BOX_W,bh);
+  ctx.strokeStyle = 'rgba(156,122,43,.45)'; ctx.lineWidth = 1;
+  ctx.strokeRect(BOX_X+6,y.boxTop+6,BOX_W-12,bh-12);
+  ctx.fillStyle = COL.ink; ctx.textAlign = 'left'; ctx.font = `34px ${FONT}`;
+  s.rows.forEach(r=> ctx.fillText(r.t, BOX_X+BOX_PAD, r.y));
+  ctx.textAlign = 'center';
+
+  // 7. 理念
+  drawDivider(ctx,y.philRule,220);
+  ctx.fillStyle = COL.ink; ctx.font = `bold 31px ${FONT}`;
+  spaced(ctx,'あなたの存在を、あなたの成果で',W/2,y.phil1,4);
+  spaced(ctx,'証明する必要はありません。',W/2,y.phil2,4);
+  ctx.fillStyle = COL.inkSoft; ctx.font = `21px ${FONT}`;
+  ctx.fillText('※この証明書は、成果や能力を評価するものではありません。',W/2,y.note);
+
+  // 注意書き
+  ctx.strokeStyle = 'rgba(156,122,43,.55)'; ctx.lineWidth = 1.2;
+  ctx.strokeRect(BOX_X,y.noticeTop,BOX_W,y.noticeBottom-y.noticeTop);
+  ctx.fillStyle = COL.goldDeep; ctx.font = `bold 22px ${FONT}`;
+  spaced(ctx,'注意事項',W/2,y.noticeHead,10);
+  ctx.fillStyle = COL.ink; ctx.textAlign = 'left'; ctx.font = `21px ${FONT}`;
+  s.noticeRows.forEach(r=>{
+    if(r.mark) ctx.fillText(r.mark, BOX_X+30, y.noticeText+r.off);
+    ctx.fillText(r.t, BOX_X+66, y.noticeText+r.off);
+  });
+  ctx.textAlign = 'center';
+
+  // 8. 発行者名（公印は別レイヤー）
+  ctx.strokeStyle = 'rgba(156,122,43,.55)'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(130,y.footer); ctx.lineTo(W-130,y.footer); ctx.stroke();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = COL.inkSoft; ctx.font = `20px ${FONT}`;
+  ctx.fillText('発行機関',130,y.sealCy-34);
+  ctx.fillStyle = COL.ink; ctx.font = `bold 32px ${FONT}`;
+  ctx.fillText('シカーダ星',130,y.sealCy+10);
+  ctx.font = `26px ${FONT}`;
+  ctx.fillText('存在肯定証明書発行局',130,y.sealCy+54);
+  ctx.textAlign = 'center';
+}
+
+function renderBase(s){
+  const c = document.createElement('canvas');
+  c.width = Math.round(W*s.S); c.height = Math.round(s.H*s.S);
+  const ctx = c.getContext('2d');
+  ctx.scale(c.width/W, c.height/s.H);
+  paintPaper(ctx,s.H,s.seed);
+  drawFrame(ctx,s.H);
+  drawContent(ctx,s);
+  return c;
+}
+
+/* =========================================================
+   公印（朱色の二重円・星章・弧状文字・かすれ）
+   ========================================================= */
+function arcText(ctx,text,r,mid,size,top){
+  const chars = [...text];
+  const step = size*1.08/r;                         // 1文字あたりの角度
+  const span = step*(chars.length-1);
+  ctx.save();
+  ctx.font = `bold ${size}px ${FONT}`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  chars.forEach((ch,i)=>{
+    let th;
+    if(top){ th = mid - span/2 + i*step; }          // 上側：左→右
+    else   { th = mid + span/2 - i*step; }          // 下側：左→右
+    ctx.save();
+    ctx.translate(Math.cos(th)*r, Math.sin(th)*r);
+    ctx.rotate(top ? th + Math.PI/2 : th - Math.PI/2);
+    ctx.fillText(ch,0,0);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+function makeSeal(seed){
+  const L = 220, k = 2;
+  const c = document.createElement('canvas');
+  c.width = L*k; c.height = L*k;
+  const ctx = c.getContext('2d');
+  ctx.scale(k,k); ctx.translate(L/2,L/2);
+  const col = COL.seal;
+  ctx.strokeStyle = col; ctx.fillStyle = col;
+
+  ctx.lineWidth = 6;   circle(ctx,98);
+  ctx.lineWidth = 2;   circle(ctx,87);
+  ctx.lineWidth = 2;   circle(ctx,53);
+
+  arcText(ctx,'シカーダ星',70,-Math.PI/2,25,true);
+  arcText(ctx,'存在肯定',70,Math.PI/2,25,false);
+  // 左右の区切り（小さな菱形）
+  [0,Math.PI].forEach(a=>{
+    ctx.save(); ctx.translate(Math.cos(a)*70,Math.sin(a)*70); ctx.rotate(Math.PI/4);
+    ctx.fillRect(-4.5,-4.5,9,9); ctx.restore();
+  });
+  drawEmblem(ctx,0,0,43,col,2.3);
+
+  // かすれ（判読性を損なわない程度に、小さな欠けを散らす）
+  const rand = mulberry32(seed ^ 0x5bd1e995);
+  ctx.globalCompositeOperation = 'destination-out';
+  for(let i=0;i<230;i++){
+    const a = rand()*Math.PI*2, d = Math.sqrt(rand())*100;
+    ctx.globalAlpha = 0.45 + rand()*0.55;
+    ctx.beginPath(); ctx.arc(Math.cos(a)*d,Math.sin(a)*d,0.5+rand()*1.7,0,Math.PI*2); ctx.fill();
+  }
+  for(let i=0;i<7;i++){
+    const a = rand()*Math.PI*2, d = 40 + rand()*60;
+    ctx.globalAlpha = 0.2 + rand()*0.18;
+    ctx.beginPath(); ctx.arc(Math.cos(a)*d,Math.sin(a)*d,5+rand()*9,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  return c;
+}
+
+/* =========================================================
+   証明書：合成（静的レイヤー + 公印 + 押印演出）
+   ========================================================= */
+let state = null, baseCanvas = null, sealCanvas = null;
+const SEAL_ALPHA = 0.93, SEAL_ROT = -0.07, STAMP_MS = 1150;
+
+function setupCert(s){
+  baseCanvas = renderBase(s);
+  sealCanvas = makeSeal(s.seed);
+  const c = $('cert');
+  c.width = baseCanvas.width; c.height = baseCanvas.height;
+}
+function ease(u){ return u*u; }
+
+function compose(t,parts){
+  const s = state, c = $('cert'), ctx = c.getContext('2d');
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.drawImage(baseCanvas,0,0);
+  if(t < 0) return;                                 // 押印前
+
+  ctx.setTransform(c.width/W,0,0,c.height/s.H,0,0);
+  const sx = s.sealX, sy = s.sealY;
+  let scale = 1, alpha = SEAL_ALPHA;
+
+  if(t < 500){                                      // 上から降りてくる
+    const u = t/500, e = ease(u);
+    scale = 1.55 - 0.55*e;
+    alpha = Math.min(1,u*1.6)*SEAL_ALPHA;
+    ctx.fillStyle = `rgba(40,25,10,${0.16*(1-u)})`;  // 浮いている印の影
+    ctx.beginPath(); ctx.arc(sx+18*(1-u),sy+26*(1-u),100*scale,0,Math.PI*2); ctx.fill();
+  }else if(t < 720){                                // 着地の小さな跳ね
+    const v = (t-500)/220;
+    scale = 1 - 0.05*Math.sin(Math.PI*v);
+  }
+
+  // 波紋（控えめな金色）
+  if(t >= 500 && t < 950){
+    const v = (t-500)/450;
+    ctx.strokeStyle = `rgba(201,162,75,${0.38*(1-v)})`; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(sx,sy,102+58*v,0,Math.PI*2); ctx.stroke();
+  }
+
+  // 公印
+  ctx.save();
+  ctx.translate(sx,sy); ctx.rotate(SEAL_ROT); ctx.scale(scale,scale);
+  ctx.globalAlpha = alpha;
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.drawImage(sealCanvas,-110,-110,220,220);
+  ctx.restore();
+
+  // 金の粒子（演出中のみ。保存画像には残らない）
+  if(parts && t >= 500){
+    const tt = t-500;
+    parts.forEach(p=>{
+      if(tt >= p.l) return;
+      const d = 104 + p.v*tt/1000;
+      ctx.fillStyle = `rgba(201,162,75,${0.85*(1-tt/p.l)})`;
+      ctx.beginPath(); ctx.arc(sx+Math.cos(p.a)*d, sy+Math.sin(p.a)*d, p.s, 0, Math.PI*2); ctx.fill();
+    });
+  }
+  ctx.setTransform(1,0,0,1,0,0);
+}
+const FINAL_T = 99999;
+
+function playStamp(id,done){
+  const rand = mulberry32(state.seed ^ 0x9e3779b1);
+  const parts = Array.from({length:26},()=>({a:rand()*Math.PI*2, v:40+rand()*120, s:1.1+rand()*1.9, l:420+rand()*420}));
+  const wrap = $('certWrap');
+  const t0 = performance.now();
+  let thud = false;
+  function frame(now){
+    if(id !== runId) return;
+    const t = now - t0;
+    if(t >= STAMP_MS){ compose(FINAL_T,null); done(); return; }
+    compose(t,parts);
+    if(t >= 500 && !thud){
+      thud = true;
+      wrap.classList.remove('thud'); void wrap.offsetWidth; wrap.classList.add('thud');
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* =========================================================
+   申請 → 発行
+   ========================================================= */
+function setStatus(main,sub){ $('statusMain').textContent = main; $('statusSub').textContent = sub || ''; }
+
+$('submit').onclick = ()=>{
+  const dateStr = $('date').value;
+  const raw = $('event').value;
+  if(!dateStr){
+    showError('日付がまだ選ばれていません。記録したい日を選んでください。',$('date')); return;
+  }
+  if(!raw.trim()){
+    showError('出来事がまだ空白です。ひとことだけでも、記録してみませんか。',$('event')); return;
+  }
+  clearError();
+
+  state = prepare(dateStr, raw.slice(0,MAX_LEN));
+  setupCert(state);
+  compose(-1,null);
+
+  show('result');
+  const id = runId;                                   // show() で更新された最新のID
+  const wrap = $('certWrap');
+  wrap.classList.remove('show','thud');
+  $('after').hidden = true;
+  setStatus('');
+
+  const finish = ()=>{
+    setStatus('存在肯定証明書、発行完了','この一日を生きた事実を、シカーダ星が肯定します。');
+    $('after').hidden = false;
+  };
+
+  if(reduceMotion()){                                 // アニメーション無効設定への配慮
+    compose(FINAL_T,null);
+    wrap.classList.add('show');
+    finish();
+    return;
+  }
+
+  const later = (ms,fn)=> setTimeout(()=>{ if(id === runId) fn(); }, ms);
+  setStatus('申請を受理しています…');
+  later(450,()=> setStatus('シカーダ星歴を確定しています…', cicadaText(state.dateStr)));
+  later(950,()=>{
+    setStatus('証明書を準備しています…');
+    wrap.classList.add('show');                       // 生成り色の証明書が静かに現れる
+  });
+  later(1650,()=>{
+    setStatus('公印を押印しています…');
+    playStamp(id,()=>{ if(id === runId) finish(); });
+  });
+};
+
+/* =========================================================
+   画像として保存（Canvasをそのまま高解像度PNGで出力）
+   ========================================================= */
+$('save').onclick = ()=>{
+  const c = $('cert');
+  c.toBlob(blob=>{
+    if(!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `存在肯定証明書_${state.dateStr}.png`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+  },'image/png');
+};
+
+/* 初期化 */
+drawHomeEmblem();
+window.addEventListener('resize',drawHomeEmblem);
+</script>
+</body>
+</html>
