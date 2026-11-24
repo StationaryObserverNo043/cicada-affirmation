@@ -80,11 +80,10 @@
   #home .btn-secondary{background:rgba(255,255,255,.74);color:#16367e;border:1px solid rgba(22,54,126,.45);letter-spacing:.2em;text-indent:.2em}
   #home .btn-secondary:hover{background:rgba(255,255,255,.92)}
   .foot{
-    display:none;margin:16px 0 0;font-size:13px;line-height:1.9;color:#2a4a86;letter-spacing:.06em;
+    display:block;margin:16px 0 0;font-size:13px;line-height:1.9;color:#2a4a86;letter-spacing:.06em;
     text-shadow:0 0 8px rgba(255,255,255,.9);
   }
   body.is-home .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
-  @media (min-height:760px) and (max-width:599px){ .foot{display:block} }
   @media (max-height:700px),(min-width:600px){     /* 背の低い画面・PCではイラストにかからないよう詰める */
     .motto{font-size:15px;line-height:1.85;margin-bottom:14px}
     #home .btn-primary{min-height:58px;font-size:19px}
@@ -236,8 +235,6 @@
   <section id="home" class="screen active" aria-labelledby="homeTitle">
     <h1 class="sr-only" id="homeTitle">シカーダ星 存在肯定証明書発行局</h1>
 
-    <p class="motto">あなたの存在は、<br>あなたの成果で<br>証明するものではありません。</p>
-
     <div class="actions">
       <button class="btn btn-primary" id="goApply" type="button">発行申請<small>APPLICATION</small></button>
       <div class="sub-actions">
@@ -246,7 +243,7 @@
       </div>
     </div>
 
-    <p class="foot">何気ない一日も、そのまま受け付けています。</p>
+    <p class="foot">何気ない瞬間を、ありのまま受け付けています。</p>
   </section>
 
   <!-- 当局について -->
