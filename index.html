@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a1d17">
+<meta name="theme-color" content="#9cc0f2">
 <title>シカーダ星｜存在肯定証明書発行局</title>
 <style>
   :root{
@@ -23,18 +23,18 @@
   html{-webkit-text-size-adjust:100%}
   html,body{margin:0;min-height:100%}
   body{
-    background:radial-gradient(ellipse 130% 80% at 50% 0%,#17392d 0%,var(--forest) 42%,var(--deep) 100%) fixed;
-    color:#e9efe9;
+    background:linear-gradient(180deg,#9cc0f2 0%,#cfe3fb 38%,#e4f0ff 100%) fixed;
+    color:#14306b;
     font-family:var(--serif);
     line-height:1.8;
     overflow-x:hidden;
   }
-  /* 画面全体を囲む二重の金線（公文書の枠） */
+  /* 画面全体を囲む二重の線（公文書の枠）。ホームの空色に合わせた紺色 */
   body::before,body::after{
     content:"";position:fixed;pointer-events:none;z-index:0;
   }
-  body::before{inset:8px;border:1px solid rgba(201,162,75,.42)}
-  body::after{inset:13px;border:1px solid rgba(201,162,75,.16)}
+  body::before{inset:8px;border:1px solid rgba(22,54,126,.38)}
+  body::after{inset:13px;border:1px solid rgba(22,54,126,.16)}
 
   .wrap{
     position:relative;z-index:1;
@@ -45,38 +45,51 @@
   .screen.active{display:block;animation:fadeIn .7s ease both}
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-  /* ---------- ホーム ---------- */
+  /* ---------- ホーム（背景イラスト＋画面下部のボタン） ---------- */
+  .home-bg{
+    display:none;position:fixed;inset:0;z-index:0;
+    background:#c7e2fd url("images/home-bg.jpg") center top/cover no-repeat;
+  }
+  .home-bg::after{       /* 下部の文字・ボタンを読みやすくする淡い霞 */
+    content:"";position:absolute;left:0;right:0;bottom:0;height:48%;
+    background:linear-gradient(to top,rgba(220,236,255,.88),rgba(220,236,255,0));
+  }
+  body.is-home::before,body.is-home::after{display:none}
+  body.is-home .home-bg{display:block}
+  @media (min-width:600px){
+    .home-bg{inset:0 auto 0 50%;width:min(560px,56.3dvh);transform:translateX(-50%);box-shadow:0 0 40px rgba(22,54,126,.28)}
+  }
+  .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
   #home.active{
-    display:flex;flex-direction:column;align-items:center;text-align:center;
+    display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;
     min-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
-  #emblem{width:164px;height:164px;display:block;margin:6px auto 4px}
-  .agency{
-    margin:6px 0 0;font-weight:700;color:var(--gold-light);
-    font-size:clamp(28px,9vw,40px);letter-spacing:.14em;line-height:1.35;
-    text-indent:.14em;
-  }
-  .actions .btn-secondary{margin-top:14px}
-  .agency-sub{
-    margin:4px 0 0;font-size:12px;letter-spacing:.34em;color:var(--jade-dim);
-    text-indent:.34em;font-family:"Helvetica Neue",Arial,var(--serif);
-  }
-  .rule{
-    display:flex;align-items:center;gap:12px;width:100%;max-width:300px;margin:26px auto;
-    color:var(--gold-dim);
-  }
-  .rule::before,.rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim))}
-  .rule::after{background:linear-gradient(270deg,transparent,var(--gold-dim))}
-  .rule i{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);display:block}
   .motto{
-    margin:6px 0 4px;padding:0 4px;
-    font-size:clamp(16px,4.8vw,20px);line-height:2.1;letter-spacing:.08em;color:#f1ead3;
+    margin:0 0 22px;padding:0 4px;
+    font-size:clamp(16px,4.8vw,20px);line-height:2.1;letter-spacing:.08em;color:#14306b;
+    text-shadow:0 0 12px rgba(255,255,255,.9),0 0 3px rgba(255,255,255,.8);
     text-wrap:balance;
   }
-  .actions{width:100%;max-width:380px;margin:26px auto 0}
+  .actions{width:100%;max-width:380px;margin:0 auto}
+  .actions .btn-primary{margin:0 0 12px}
+  .sub-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .actions .sub-actions .btn-secondary{margin:0}
+  #home .btn-primary{background:#16367e;color:#fff;border:1px solid rgba(255,255,255,.75);box-shadow:0 6px 18px rgba(22,54,126,.35)}
+  #home .btn-primary:hover{background:#1d4599}
+  #home .btn-secondary{background:rgba(255,255,255,.74);color:#16367e;border:1px solid rgba(22,54,126,.45);letter-spacing:.2em;text-indent:.2em}
+  #home .btn-secondary:hover{background:rgba(255,255,255,.92)}
   .foot{
-    margin-top:auto;padding-top:34px;
-    font-size:13px;line-height:2;color:rgba(233,239,233,.7);letter-spacing:.06em;
+    display:none;margin:16px 0 0;font-size:13px;line-height:1.9;color:#2a4a86;letter-spacing:.06em;
+    text-shadow:0 0 8px rgba(255,255,255,.9);
+  }
+  body.is-home .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  @media (min-height:760px) and (max-width:599px){ .foot{display:block} }
+  @media (max-height:700px),(min-width:600px){     /* 背の低い画面・PCではイラストにかからないよう詰める */
+    .motto{font-size:15px;line-height:1.85;margin-bottom:14px}
+    #home .btn-primary{min-height:58px;font-size:19px}
+    #home .btn-secondary{min-height:46px;font-size:14px}
+    .actions .btn-primary{margin-bottom:10px}
   }
 
   /* ---------- ボタン ---------- */
@@ -86,92 +99,123 @@
     border-radius:3px;transition:transform .12s ease,background .2s ease,opacity .2s;
   }
   .btn:active{transform:translateY(1px) scale(.995)}
-  .btn:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .btn:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #2f6bd6;outline-offset:3px}
   .btn small{font-size:11px;letter-spacing:.3em;font-weight:400;opacity:.75;margin-top:2px;text-indent:.3em;font-family:"Helvetica Neue",Arial,var(--serif)}
   .btn-primary{
     min-height:68px;margin:10px 0;
-    background:var(--jade);color:#0b1f18;border:1px solid var(--gold);
+    background:#16367e;color:#fff;border:1px solid rgba(255,255,255,.75);
     font-size:21px;font-weight:700;letter-spacing:.45em;text-indent:.45em;
-    box-shadow:0 0 0 4px var(--deep),0 0 0 5px rgba(201,162,75,.65);
+    box-shadow:0 6px 18px rgba(22,54,126,.35);
   }
-  .btn-primary:hover{background:#bde8d3}
+  .btn-primary:hover{background:#1d4599}
   .btn-secondary{
-    min-height:52px;margin:22px 0 0;background:transparent;color:var(--jade);
-    border:1px solid rgba(168,220,195,.45);font-size:15px;letter-spacing:.3em;text-indent:.3em;
+    min-height:52px;margin:22px 0 0;background:rgba(255,255,255,.74);color:#16367e;
+    border:1px solid rgba(22,54,126,.45);font-size:15px;letter-spacing:.3em;text-indent:.3em;
   }
-  .btn-secondary:hover{background:rgba(168,220,195,.09)}
+  .btn-secondary:hover{background:rgba(255,255,255,.92)}
   .btn-text{
-    min-height:48px;margin:6px 0 0;background:none;border:0;color:rgba(168,220,195,.85);
-    font-size:14px;letter-spacing:.16em;text-decoration:underline;text-underline-offset:5px;text-decoration-color:rgba(168,220,195,.35);
+    min-height:48px;margin:6px 0 0;background:none;border:0;color:#2a4a86;
+    font-size:14px;letter-spacing:.16em;text-decoration:underline;text-underline-offset:5px;text-decoration-color:rgba(42,74,134,.4);
   }
   .btn[disabled]{opacity:.4;cursor:default}
 
   /* ---------- 共通見出し ---------- */
   .head{text-align:center;margin-bottom:24px}
-  .head h1{margin:0;font-size:26px;letter-spacing:.3em;text-indent:.3em;color:var(--gold-light)}
-  .head p{margin:4px 0 0;font-size:11px;letter-spacing:.32em;color:var(--jade-dim);font-family:"Helvetica Neue",Arial,var(--serif)}
+  .head h1,.head h2{margin:0;font-size:26px;letter-spacing:.3em;text-indent:.3em;color:#16367e}
+  .head p{margin:4px 0 0;font-size:11px;letter-spacing:.32em;color:#4a6fb5;font-family:"Helvetica Neue",Arial,var(--serif)}
 
   /* ---------- 申請 ---------- */
   .panel{
-    border:1px solid rgba(201,162,75,.5);background:rgba(7,19,15,.5);
+    border:1px solid rgba(22,54,126,.3);background:rgba(255,255,255,.62);
     padding:22px 18px 20px;border-radius:3px;
-    box-shadow:inset 0 0 0 4px rgba(7,19,15,.7),inset 0 0 0 5px rgba(201,162,75,.18);
+    box-shadow:inset 0 0 0 4px rgba(255,255,255,.5),inset 0 0 0 5px rgba(22,54,126,.12),0 8px 24px rgba(22,54,126,.12);
   }
-  .field-label{display:block;margin:0 0 8px;font-size:14px;letter-spacing:.14em;color:var(--gold-light)}
-  .field-label span{color:var(--jade-dim);margin-right:.5em}
+  .field-label{display:block;margin:0 0 8px;font-size:14px;letter-spacing:.14em;color:#16367e;font-weight:700}
+  .field-label span{color:#4a6fb5;margin-right:.5em;font-weight:400}
   input[type=date]{
     width:100%;min-height:54px;padding:10px 14px;border-radius:3px;
-    background:rgba(244,235,210,.07);color:#f1ead3;border:1px solid rgba(201,162,75,.6);
-    font-size:18px;font-family:var(--serif);color-scheme:dark;
+    background:#fff;color:#14306b;border:1px solid rgba(22,54,126,.45);
+    font-size:18px;font-family:var(--serif);color-scheme:light;
   }
   .cicada-date{
     margin:14px 0 26px;padding:10px 6px;text-align:center;
-    border-top:1px solid rgba(201,162,75,.4);border-bottom:1px solid rgba(201,162,75,.4);
-    color:var(--gold);
+    border-top:1px solid rgba(22,54,126,.3);border-bottom:1px solid rgba(22,54,126,.3);
+    color:#1d4599;
   }
-  .cicada-date .k{display:block;font-size:11px;letter-spacing:.3em;color:var(--gold-dim);text-indent:.3em}
+  .cicada-date .k{display:block;font-size:11px;letter-spacing:.3em;color:#4a6fb5;text-indent:.3em}
   .cicada-date .v{display:block;font-size:clamp(19px,5.6vw,23px);letter-spacing:.08em;font-weight:700;margin-top:2px}
   textarea{
     width:100%;min-height:210px;padding:16px;border-radius:3px;resize:vertical;
-    background:var(--paper);color:var(--ink);border:1px solid var(--gold-dim);
+    background:#fff;color:#1c2a4a;border:1px solid rgba(22,54,126,.45);
     font-size:17px;line-height:1.95;font-family:var(--serif);
-    box-shadow:inset 0 2px 8px rgba(90,60,20,.14);
+    box-shadow:inset 0 2px 8px rgba(22,54,126,.1);
   }
-  textarea::placeholder{color:#8e866a}
-  .count{text-align:right;font-size:12px;color:rgba(233,239,233,.5);margin-top:6px;letter-spacing:.08em}
+  textarea::placeholder{color:#7f93b8}
+  .count{text-align:right;font-size:12px;color:rgba(20,48,107,.6);margin-top:6px;letter-spacing:.08em}
   .err{
     margin:16px 0 0;padding:11px 14px;font-size:14px;line-height:1.8;
-    color:#f0d9a8;background:rgba(224,184,114,.09);border-left:3px solid #d9b46a;
+    color:#7a4b00;background:rgba(255,196,92,.22);border-left:3px solid #d99a2b;
   }
   .err[hidden]{display:none}
   .submit-wrap{margin-top:24px}
 
   /* ---------- 当局について ---------- */
   .about h2{
-    margin:30px 0 8px;font-size:17px;letter-spacing:.2em;color:var(--gold-light);font-weight:700;
+    margin:30px 0 8px;font-size:17px;letter-spacing:.2em;color:#16367e;font-weight:700;
     display:flex;align-items:center;gap:10px;
   }
   .about h2:first-of-type{margin-top:0}
-  .about h2::before{content:"";width:7px;height:7px;background:var(--gold);transform:rotate(45deg);flex:none}
-  .about p{margin:0 0 12px;font-size:15px;line-height:2;color:rgba(241,234,211,.92);letter-spacing:.04em}
-  .facts{margin:0 0 6px;border-top:1px solid rgba(201,162,75,.35)}
-  .facts div{display:flex;gap:14px;padding:10px 2px;border-bottom:1px solid rgba(201,162,75,.2);font-size:14px;line-height:1.8}
-  .facts dt{flex:0 0 5.6em;color:var(--gold);letter-spacing:.1em}
-  .facts dd{margin:0;color:rgba(241,234,211,.92)}
+  .about h2::before{content:"";width:7px;height:7px;background:#2f6bd6;transform:rotate(45deg);flex:none}
+  .about p{margin:0 0 12px;font-size:15px;line-height:2;color:#1c2e57;letter-spacing:.04em}
   .about .creed{
     margin:18px 0 4px;padding:16px 8px;text-align:center;font-size:clamp(17px,5vw,20px);line-height:2.1;
-    color:var(--gold-light);border-top:1px solid rgba(201,162,75,.4);border-bottom:1px solid rgba(201,162,75,.4);
+    color:#16367e;border-top:1px solid rgba(22,54,126,.35);border-bottom:1px solid rgba(22,54,126,.35);
   }
+
+
+  /* ---------- 挿絵・ギャラリー ---------- */
+  .pic{margin:16px 0 4px}
+  .pic img{display:block;width:100%;height:auto;border-radius:3px;border:1px solid rgba(22,54,126,.3);box-shadow:0 6px 18px rgba(22,54,126,.18);background:#dbe8fb}
+  .gallery{margin-top:40px}
+  .gallery .head{margin-bottom:16px}
+  .gallery .head h2{font-size:22px}
+  .carousel{position:relative}
+  .track{
+    display:flex;margin:0;padding:0;list-style:none;overflow-x:auto;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;
+    border-radius:3px;border:1px solid rgba(22,54,126,.3);box-shadow:0 8px 24px rgba(22,54,126,.2);background:#dbe8fb;
+  }
+  .track::-webkit-scrollbar{display:none}
+  .track li{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always}
+  .track img{display:block;width:100%;height:auto}
+  .nav{
+    position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;padding:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;
+    color:#fff;background:rgba(22,54,126,.62);border:1px solid rgba(255,255,255,.85);
+  }
+  .nav:hover{background:rgba(22,54,126,.85)}
+  .nav.prev{left:8px}
+  .nav.next{right:8px}
+  .carousel.hint .nav.prev{animation:nudgeL 1.4s ease-in-out 3}
+  .carousel.hint .nav.next{animation:nudgeR 1.4s ease-in-out 3}
+  @keyframes nudgeR{0%,100%{transform:translateY(-50%)}50%{transform:translate(6px,-50%)}}
+  @keyframes nudgeL{0%,100%{transform:translateY(-50%)}50%{transform:translate(-6px,-50%)}}
+  .carousel-meta{margin-top:12px;text-align:center}
+  .count-pos{font-size:13px;letter-spacing:.2em;color:#16367e}
+  .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:8px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:rgba(22,54,126,.25)}
+  .dots i.on{background:#16367e}
+  .swipe-hint{margin:8px 0 0;font-size:13px;letter-spacing:.16em;color:#3a5a99}
 
   /* ---------- 結果 ---------- */
   .status{min-height:76px;text-align:center;margin:0 0 16px}
-  .status .main{font-size:clamp(19px,5.6vw,23px);letter-spacing:.14em;color:var(--jade);font-weight:700}
-  .status .sub{font-size:13px;color:rgba(233,239,233,.7);letter-spacing:.06em;margin-top:4px}
+  .status .main{font-size:clamp(19px,5.6vw,23px);letter-spacing:.14em;color:#16367e;font-weight:700}
+  .status .sub{font-size:13px;color:#3a5a99;letter-spacing:.06em;margin-top:4px}
   #certWrap{opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s ease}
   #certWrap.show{opacity:1;transform:none}
   #certWrap.thud{animation:thud .18s ease-out}
   @keyframes thud{0%{transform:translateY(0)}35%{transform:translateY(3px)}70%{transform:translateY(-1px)}100%{transform:translateY(0)}}
-  #cert{display:block;width:100%;height:auto;max-width:100%;box-shadow:0 12px 44px rgba(0,0,0,.6),0 0 0 1px rgba(201,162,75,.25)}
+  #cert{display:block;width:100%;height:auto;max-width:100%;box-shadow:0 12px 44px rgba(22,54,126,.38),0 0 0 1px rgba(22,54,126,.2)}
   .after{margin-top:22px}
   .after[hidden]{display:none}
 
@@ -180,29 +224,29 @@
     #certWrap{transition:none;transform:none}
     #certWrap.thud{animation:none}
     .btn{transition:none}
+    .carousel.hint .nav{animation:none}
   }
 </style>
 </head>
-<body>
+<body class="is-home">
+<div class="home-bg" aria-hidden="true"></div>
 <div class="wrap">
 
   <!-- ホーム -->
   <section id="home" class="screen active" aria-labelledby="homeTitle">
-    <canvas id="emblem" width="164" height="164" role="img" aria-label="シカーダ星の星章"></canvas>
-    <h1 class="agency" id="homeTitle">存在肯定<br>証明書発行局</h1>
-    <p class="agency-sub">CICADA STAR ／ シカーダ星</p>
-
-    <div class="rule" aria-hidden="true"><i></i></div>
+    <h1 class="sr-only" id="homeTitle">シカーダ星 存在肯定証明書発行局</h1>
 
     <p class="motto">あなたの存在は、<br>あなたの成果で<br>証明するものではありません。</p>
 
     <div class="actions">
       <button class="btn btn-primary" id="goApply" type="button">発行申請<small>APPLICATION</small></button>
-      <button class="btn btn-secondary" id="goAbout" type="button">当局について</button>
-      <a class="btn btn-secondary" id="xLink" href="#" target="_blank" rel="noopener noreferrer">通信</a>
+      <div class="sub-actions">
+        <button class="btn btn-secondary" id="goAbout" type="button">当局について</button>
+        <a class="btn btn-secondary" id="xLink" href="#" target="_blank" rel="noopener noreferrer">通信</a>
+      </div>
     </div>
 
-    <p class="foot">ようこそ、地球人の皆サマ。<br>何気ない一日も、うまくいかなかった一日も、<br>そのまま受け付けていマス。</p>
+    <p class="foot">何気ない一日も、そのまま受け付けています。</p>
   </section>
 
   <!-- 当局について -->
@@ -212,38 +256,81 @@
       <p>ABOUT THE BUREAU</p>
     </div>
     <div class="panel about">
-      <h2>シカーダ星</h2>
-      <dl class="facts">
-        <div><dt>名称</dt><dd>シカーダ星（CICADA STAR）</dd></div>
-        <div><dt>住民</dt><dd>シカーダ星人。地球のセミに相当する生物を起源とする</dd></div>
-        <div><dt>交流</dt><dd>ゼド星系との往来が深い</dd></div>
-        <div><dt>幼体期</dt><dd>約7年</dd></div>
-        <div><dt>成体期</dt><dd>約7日間（地球時間）</dd></div>
-        <div><dt>暦</dt><dd>シカーダ星歴</dd></div>
-      </dl>
+      <h2>名の由来</h2>
+      <p>シカーダ星人。その名は、地球の昆虫「セミ」に由来します。ゼド星系との交流も深い、静かな惑星に暮らす人々です。</p>
+      <p>彼らは、成体として過ごす期間が地球時間でわずか7日間という、とても短い時間を生きる種族です。地球人にとっての7日間は、仕事をして、食事をして、眠って、気がつけばあっという間に過ぎ去ってしまう時間かもしれません。</p>
 
-      <h2>生態</h2>
-      <p>シカーダ星人は、卵から孵化し、脱皮を重ねて成体となる生命です。孵化後は、腐葉土を基盤とした専用の育成ポッドで育ち、約7年をかけて身体を発達させます。必要に応じて外気のもとで活動することもできます。</p>
-      <p>最後の脱皮を経て成体となったのち、活動できる期間は地球時間でおよそ7日間です。</p>
+      <figure class="pic"><img src="images/cicada1.webp" width="1400" height="732" alt="近未来の都市を背に、ノートパソコンに向かって仕事をするシカーダ星人" loading="lazy" decoding="async"></figure>
 
-      <h2>人生のとらえ方</h2>
-      <p>シカーダ星人にとって、約7日間は生涯の長さではありません。卵の時間も、ポッドで過ごした長い年月も、成体として過ごす短い日々も、すべてがひとつの人生を構成しています。</p>
-      <p>そのため、この星では、成果や結果だけで生命の価値を測りません。何気ない会話も、いつもどおりの食事も、思うようにいかなかった一日も、その個体が生きた時間として等しく尊重されます。</p>
+      <h2>かけがえのない一日</h2>
+      <p>けれども、彼らにとっては、その一日一日がかけがえのない時間です。</p>
+      <p>何気ない会話。いつもと変わらない朝。特別な成果のない一日。地球人が「何でもないこと」として見過ごしてしまうような出来事にも、彼らは価値を見出します。</p>
+
+      <figure class="pic"><img src="images/cicada2.webp" width="1400" height="732" alt="夕焼けの窓辺でマグカップを手に、日々の出来事を思い返すシカーダ星人" loading="lazy" decoding="async"></figure>
+
+      <h2>ひとつの生涯</h2>
+      <p>ただし、7日間は彼らの生涯のすべてではありません。シカーダ星人の一生は、幼年期、青年期、成体期という三つの段階でできています。</p>
+      <p>卵から孵化した幼体は、家庭に設けられた育成ポッドで育ちます。腐葉土を基盤とした有機的な空間で、栄養や水分、温度や湿度が整えられています。幼年期は約3年。前半は両親に養育され、脱皮を重ねながら少しずつ活動範囲を広げ、やがて自らの意思で生活の場を選べるようになります。</p>
+      <p>続く青年期は約4年。心身の自立が進み、パートナーと家庭を築き、次の世代を迎える人もいます。両親や親族が力を合わせて幼体を見守り、ともに過ごす日々は、かけがえのない家族の時間になります。</p>
+      <p>そして最後の脱皮を経て、成体期が訪れます。約7日間のこの時間は、自らの生涯を振り返るためのものです。これまでの経験をたどり、大切な存在と過ごし、記憶や記録を次の世代へ手渡します。けれど、何かを残すことは義務ではありません。特別な功績がなくても、誰の記憶に残らなくても、過ごしてきた時間の価値は変わりません。最後の日まで食事を楽しみ、誰かと笑い、何気ない日常を過ごす。それもまた、大切な生涯の一部です。</p>
+
+      <figure class="pic"><img src="images/cicada3.webp" width="1400" height="732" alt="育成ポッドの中で孵化した幼体を、両親が見守っている" loading="lazy" decoding="async"></figure>
 
       <h2>存在の記録</h2>
-      <p>シカーダ星では、個体が過ごした時間や経験を記録する文化が古くから根づいています。記録は、優劣をつけるための評価表ではなく、その個体が確かにそこにいたことを受け止めるためのものです。大きな成果を残した者だけが記録されることはありません。</p>
+      <p>幼年期には幼年期の、青年期には青年期の、成体期には成体期の価値があります。成体になることだけが人生の意味ではなく、子を育てることだけが生命の価値を証明するわけでもありません。最後に何かを残せたかどうかも、その価値を左右しません。ただ、その生命が存在し、それぞれの時間を過ごしてきたという事実そのものに、価値を見出すのです。</p>
+      <p>この考え方から、シカーダ星では、個体が過ごした時間を記録する文化が根づきました。記録は優劣をつけるための評価表ではなく、その個体が確かにそこにいたことを受け止めるためのものです。</p>
 
-      <h2>存在肯定証明書発行局</h2>
-      <p>当局は、この思想を公的な仕組みとして担う機関です。申請された出来事を記録し、その日を生きた事実を証明書として発行します。出来事の正しさや価値を審査することはありません。</p>
+      <figure class="pic"><img src="images/cicada4.webp" width="1400" height="732" alt="運動会で、ゴールテープに向かって駆けるシカーダ星の子どもたち" loading="lazy" decoding="async"></figure>
+
+      <h2>当局の役割</h2>
+      <p>存在肯定証明書発行局は、この思想を公的な仕組みとして担う機関です。申請された出来事を記録し、その日を生きた事実を証明書として発行します。出来事の正しさや価値を審査することはありません。</p>
       <p>肯定の対象は、成果や評価とは切り離された「存在そのもの」です。反省することも、失敗から学ぶことも妨げません。ただ、うまくいかなかったからといって、その人の存在まで否定する必要はないと、当局は考えます。</p>
 
-      <h2>シカーダ星歴</h2>
-      <p>当局が発行する証明書には、シカーダ星歴を併記します。地球の年・月・日の数値をそれぞれ7倍した表記で、たとえば地球暦の2026年10月30日は、シカーダ星歴14182年70月210日にあたります。</p>
+      <figure class="pic"><img src="images/cicada5.webp" width="1400" height="732" alt="教室で並んで授業を受けるシカーダ星の学生たち" loading="lazy" decoding="async"></figure>
+
+      <h2>注意事項</h2>
+      <p>当局が発行する証明書には、シカーダ星歴を併記します。</p>
+      <p>当局が発行する証明書は、ありのままの出来事を記録し、対象の存在を前向きに後押しするものです。</p>
+      <p>肯定の対象は存在そのものであり、行動を正当化するものではありません。犯罪その他の違法・不当な行為を、肯定・容認・推奨するものではないことをご承知ください。</p>
+      <p>犯罪など法的な判断に関する事項は、申請のあった当該惑星における現地の法令に準じるものとします。</p>
 
       <p class="creed">あなたの存在を、<br>あなたの成果で<br>証明する必要はありません。</p>
     </div>
     <div class="submit-wrap">
       <button class="btn btn-primary" id="aboutApply" type="button">発行申請へ</button>
+    </div>
+
+    <section class="gallery" aria-labelledby="galTitle">
+      <div class="head">
+        <h2 id="galTitle">シカーダ星の暮らし</h2>
+        <p>GALLERY</p>
+      </div>
+      <div class="carousel hint" id="carousel">
+        <ul class="track" id="track" tabindex="0" aria-label="シカーダ星の画像（左右にスワイプして切り替え）">
+          <li><img src="images/cicada7.webp" width="1400" height="732" alt="カメラやバスケットを手に、街を歩く家族" decoding="async"></li>
+          <li><img src="images/cicada2.webp" width="1400" height="732" alt="夕焼けの窓辺でマグカップを手に、日々の出来事を思い返すシカーダ星人" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada12.webp" width="1400" height="732" alt="水と緑にあふれた、シカーダ星の都市の景色" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada5.webp" width="1400" height="732" alt="教室で並んで授業を受けるシカーダ星の学生たち" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada9.webp" width="1400" height="732" alt="満天の星空の下、丘に並んで街を眺める年老いた二人" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada1.webp" width="1400" height="732" alt="近未来の都市を背に、ノートパソコンに向かって仕事をするシカーダ星人" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada8.webp" width="1400" height="732" alt="白い花に囲まれて、結婚式を挙げる二人" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada4.webp" width="1400" height="732" alt="運動会で、ゴールテープに向かって駆けるシカーダ星の子どもたち" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada11.webp" width="1400" height="732" alt="食卓を囲み、笑顔で食事をする家族" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada3.webp" width="1400" height="732" alt="育成ポッドの中で孵化した幼体を、両親が見守っている" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada6.webp" width="1400" height="732" alt="近未来の広場で語らう、学生服姿のシカーダ星人たち" loading="lazy" decoding="async"></li>
+          <li><img src="images/cicada10.webp" width="1400" height="732" alt="夕暮れの寝室で、家族に見守られる年老いたシカーダ星人" loading="lazy" decoding="async"></li>
+        </ul>
+        <button class="nav prev" type="button" aria-label="前の画像">◁</button>
+        <button class="nav next" type="button" aria-label="次の画像">▷</button>
+      </div>
+      <div class="carousel-meta">
+        <div class="count-pos"><span id="galPos">1</span> / 12</div>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <p class="swipe-hint">◁　左右にスワイプ　▷</p>
+      </div>
+    </section>
+
+    <div class="submit-wrap" style="margin-top:8px">
       <button class="btn btn-text" id="backHome3" type="button">ホームへ戻る</button>
     </div>
   </section>
@@ -399,23 +486,17 @@ function drawEmblem(ctx,cx,cy,r,color,lw){
   ctx.restore();
 }
 
-function drawHomeEmblem(){
-  const c = $('emblem'), ctx = c.getContext('2d');
-  const dpr = Math.min(window.devicePixelRatio || 1, 3), size = 164;
-  c.width = size*dpr; c.height = size*dpr;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.clearRect(0,0,size,size);
-  drawEmblem(ctx,size/2,size/2,size/2-8,'#c9a24b',1.8);
-}
-
 /* =========================================================
    画面切替 / 実行中演出の取消管理
    ========================================================= */
 let runId = 0;
+let galleryReset = ()=>{};
 function show(id){
   runId++;                                    // 進行中の演出を無効化
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
+  document.body.classList.toggle('is-home', id === 'home');
+  if(id === 'about') galleryReset();   // ホームだけ背景イラストを表示
   window.scrollTo(0,0);
 }
 $('xLink').href = X_URL;
@@ -982,9 +1063,38 @@ $('save').onclick = ()=>{
   },'image/png');
 };
 
-/* 初期化 */
-drawHomeEmblem();
-window.addEventListener('resize',drawHomeEmblem);
+/* 初期状態はホーム画面（body.is-home と #home.active で指定済み） */
+
+/* =========================================================
+   画像ギャラリー（左右スワイプ／◁▷ボタン／キー操作）
+   ========================================================= */
+(function(){
+  const track = $('track'); if(!track) return;
+  const car = $('carousel'), pos = $('galPos'), dots = $('dots');
+  const n = track.children.length;
+  for(let i=0;i<n;i++) dots.appendChild(document.createElement('i'));
+  let cur = -1;
+  const idx = ()=> Math.min(n-1, Math.max(0, Math.round(track.scrollLeft / (track.clientWidth || 1))));
+  function paint(i){
+    if(i === cur) return;
+    cur = i; pos.textContent = i+1;
+    [...dots.children].forEach((d,k)=> d.classList.toggle('on', k === i));
+  }
+  function go(i){
+    track.scrollTo({left:i*track.clientWidth, behavior: reduceMotion() ? 'auto' : 'smooth'});
+  }
+  const stopHint = ()=> car.classList.remove('hint');
+  track.addEventListener('scroll', ()=> paint(idx()), {passive:true});
+  track.addEventListener('pointerdown', stopHint, {once:true});
+  car.querySelector('.prev').onclick = ()=>{ stopHint(); go((idx()-1+n)%n); };   // 最初の前は最後へ
+  car.querySelector('.next').onclick = ()=>{ stopHint(); go((idx()+1)%n); };     // 最後の次は最初へ
+  track.addEventListener('keydown', e=>{
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); stopHint(); go((idx()-1+n)%n); }
+    if(e.key === 'ArrowRight'){ e.preventDefault(); stopHint(); go((idx()+1)%n); }
+  });
+  galleryReset = ()=>{ track.scrollLeft = 0; cur = -1; paint(0); };   // 画面を開き直したら1枚目から
+  paint(0);
+})();
 </script>
 </body>
 </html>
