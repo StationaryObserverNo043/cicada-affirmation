@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#9cc0f2">
+<meta name="description" content="シカーダ星の存在肯定証明書発行局。何気ない瞬間を、ありのまま受け付けています。">
+
+<!-- SNS・LINE・noteなどに貼り付けたときの表示（OGP）
+     画像を差し替えたときは、og:image の ?v=proof の文字を別の文字に変えると、画像のキャッシュを避けられます。 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="シカーダ星｜存在肯定証明書発行局">
+<meta property="og:title" content="シカーダ星｜存在肯定証明書発行局">
+<meta property="og:description" content="何気ない瞬間を、ありのまま受け付けています。">
+<meta property="og:url" content="https://stationaryobserverno043.github.io/cicada-affirmation/">
+<meta property="og:image" content="https://stationaryobserverno043.github.io/cicada-affirmation/images/ogp.jpg?v=proof">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="シカーダ星 存在肯定証明書発行局。近未来の都市を背に、デスクで仕事をするシカーダ星人">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="シカーダ星｜存在肯定証明書発行局">
+<meta name="twitter:description" content="何気ない瞬間を、ありのまま受け付けています。">
 <title>シカーダ星｜存在肯定証明書発行局</title>
 <style>
   :root{
@@ -218,7 +234,18 @@
   .after{margin-top:22px}
   .after[hidden]{display:none}
 
+  /* 押印演出（画面全体のCanvasと、着地の揺れ） */
+  #stampFx{position:fixed;inset:0;width:100%;height:100%;display:none;pointer-events:none;z-index:40}
+  .wrap.quake{animation:quake .34s cubic-bezier(.36,.07,.19,.97) both}
+  @keyframes quake{
+    10%,90%{transform:translate3d(-2px,3px,0)}
+    20%,80%{transform:translate3d(4px,-6px,0)}
+    30%,50%,70%{transform:translate3d(-7px,7px,0)}
+    40%,60%{transform:translate3d(6px,-5px,0)}
+  }
+
   @media (prefers-reduced-motion:reduce){
+    .wrap.quake{animation:none}
     .screen.active{animation:none}
     #certWrap{transition:none;transform:none}
     #certWrap.thud{animation:none}
@@ -229,6 +256,7 @@
 </head>
 <body class="is-home">
 <div class="home-bg" aria-hidden="true"></div>
+<canvas id="stampFx" aria-hidden="true"></canvas>
 <div class="wrap">
 
   <!-- ホーム -->
@@ -644,11 +672,11 @@ function prepare(dateStr,text){
   });
   y.noticeBottom = y.noticeText + (ny - 12 - 36) + 30;
   y.footer = y.noticeBottom + 56;
-  y.sealCy = y.footer + 140;
-  s.sealX = W - 250;
-  s.sealY = y.sealCy;
+  y.sealCy = y.footer + 110;                   // 発行機関名の基準位置（公印は上部に押す）
+  s.sealX = W - 160;                           // 公印は右上、星章・発行局名・タイトルと重ならない位置
+  s.sealY = 205;
 
-  s.H = Math.ceil(y.sealCy + 100 + 60 + 58);   // 公印下端 + 余白 + 内枠
+  s.H = Math.ceil(y.sealCy + 54 + 110);        // 発行機関名の下端 + 余白 + 内枠
   s.y = y;
   s.S = Math.max(0.6, Math.min(2, Math.sqrt(MAX_AREA / (W * s.H))));
   return s;
@@ -824,14 +852,13 @@ function drawContent(ctx,s){
   // 8. 発行者名（公印は別レイヤー）
   ctx.strokeStyle = 'rgba(156,122,43,.55)'; ctx.lineWidth = 1.2;
   ctx.beginPath(); ctx.moveTo(130,y.footer); ctx.lineTo(W-130,y.footer); ctx.stroke();
-  ctx.textAlign = 'left';
-  ctx.fillStyle = COL.inkSoft; ctx.font = `20px ${FONT}`;
-  ctx.fillText('発行機関',130,y.sealCy-34);
-  ctx.fillStyle = COL.ink; ctx.font = `bold 32px ${FONT}`;
-  ctx.fillText('シカーダ星',130,y.sealCy+10);
-  ctx.font = `26px ${FONT}`;
-  ctx.fillText('存在肯定証明書発行局',130,y.sealCy+54);
   ctx.textAlign = 'center';
+  ctx.fillStyle = COL.inkSoft; ctx.font = `20px ${FONT}`;
+  spaced(ctx,'発行機関',W/2,y.sealCy-34,8);
+  ctx.fillStyle = COL.ink; ctx.font = `bold 32px ${FONT}`;
+  spaced(ctx,'シカーダ星',W/2,y.sealCy+10,6);
+  ctx.font = `26px ${FONT}`;
+  spaced(ctx,'存在肯定証明書発行局',W/2,y.sealCy+54,4);
 }
 
 function renderBase(s){
@@ -910,7 +937,8 @@ function makeSeal(seed){
    証明書：合成（静的レイヤー + 公印 + 押印演出）
    ========================================================= */
 let state = null, baseCanvas = null, sealCanvas = null;
-const SEAL_ALPHA = 0.93, SEAL_ROT = -0.07, STAMP_MS = 1150;
+const SEAL_ALPHA = 0.93, SEAL_ROT = -0.07, SEAL_K = 0.94;     // SEAL_K：公印の大きさの倍率
+const DESC_MS = 480, TAIL_MS = 640;                            // 降下の長さ／押印後の余韻
 
 function setupCert(s){
   baseCanvas = renderBase(s);
@@ -918,9 +946,10 @@ function setupCert(s){
   const c = $('cert');
   c.width = baseCanvas.width; c.height = baseCanvas.height;
 }
-function ease(u){ return u*u; }
 
-function compose(t,parts){
+/* 証明書キャンバスへの合成。t は押印してからの経過ms（負なら押印前、FINAL_T なら完成形）。
+   保存されるPNGには、この完成形（紙面 + 公印）だけが入る。 */
+function compose(t){
   const s = state, c = $('cert'), ctx = c.getContext('2d');
   ctx.setTransform(1,0,0,1,0,0);
   ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
@@ -928,64 +957,209 @@ function compose(t,parts){
   ctx.drawImage(baseCanvas,0,0);
   if(t < 0) return;                                 // 押印前
 
+  let k = SEAL_K;
+  if(t < 220) k *= 1 - 0.06*Math.sin(Math.PI*t/220); // 着地の小さな沈み込み
   ctx.setTransform(c.width/W,0,0,c.height/s.H,0,0);
-  const sx = s.sealX, sy = s.sealY;
-  let scale = 1, alpha = SEAL_ALPHA;
-
-  if(t < 500){                                      // 上から降りてくる
-    const u = t/500, e = ease(u);
-    scale = 1.55 - 0.55*e;
-    alpha = Math.min(1,u*1.6)*SEAL_ALPHA;
-    ctx.fillStyle = `rgba(40,25,10,${0.16*(1-u)})`;  // 浮いている印の影
-    ctx.beginPath(); ctx.arc(sx+18*(1-u),sy+26*(1-u),100*scale,0,Math.PI*2); ctx.fill();
-  }else if(t < 720){                                // 着地の小さな跳ね
-    const v = (t-500)/220;
-    scale = 1 - 0.05*Math.sin(Math.PI*v);
-  }
-
-  // 波紋（控えめな金色）
-  if(t >= 500 && t < 950){
-    const v = (t-500)/450;
-    ctx.strokeStyle = `rgba(201,162,75,${0.38*(1-v)})`; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(sx,sy,102+58*v,0,Math.PI*2); ctx.stroke();
-  }
-
-  // 公印
   ctx.save();
-  ctx.translate(sx,sy); ctx.rotate(SEAL_ROT); ctx.scale(scale,scale);
-  ctx.globalAlpha = alpha;
+  ctx.translate(s.sealX,s.sealY); ctx.rotate(SEAL_ROT);
+  ctx.globalAlpha = SEAL_ALPHA;
   ctx.globalCompositeOperation = 'multiply';
-  ctx.drawImage(sealCanvas,-110,-110,220,220);
+  ctx.drawImage(sealCanvas,-110*k,-110*k,220*k,220*k);
   ctx.restore();
-
-  // 金の粒子（演出中のみ。保存画像には残らない）
-  if(parts && t >= 500){
-    const tt = t-500;
-    parts.forEach(p=>{
-      if(tt >= p.l) return;
-      const d = 104 + p.v*tt/1000;
-      ctx.fillStyle = `rgba(201,162,75,${0.85*(1-tt/p.l)})`;
-      ctx.beginPath(); ctx.arc(sx+Math.cos(p.a)*d, sy+Math.sin(p.a)*d, p.s, 0, Math.PI*2); ctx.fill();
-    });
-  }
   ctx.setTransform(1,0,0,1,0,0);
 }
 const FINAL_T = 99999;
 
+/* 押印の瞬間：端末の振動（対応する端末のみ。iPhoneのSafariは非対応） */
+function haptic(){
+  try{ if(navigator.vibrate) navigator.vibrate([80,40,40]); }catch(e){}
+}
+/* 画面全体の揺れ */
+function quake(){
+  const w = document.querySelector('.wrap');
+  w.classList.remove('quake'); void w.offsetWidth; w.classList.add('quake');
+  setTimeout(()=> w.classList.remove('quake'), 420);
+}
+
+/* カットイン用の画像（印を押すシカーダ星人）。端をぼかして、背景の黒を「スクリーン合成」で溶かす */
+let cutCanvas = null;
+const cutImg = new Image();
+cutImg.onload = ()=>{
+  const c = document.createElement('canvas');
+  c.width = cutImg.naturalWidth; c.height = cutImg.naturalHeight;
+  const x = c.getContext('2d');
+  x.drawImage(cutImg,0,0);
+  x.globalCompositeOperation = 'destination-in';
+  const gx = x.createLinearGradient(0,0,c.width,0);
+  gx.addColorStop(0,'rgba(0,0,0,0)'); gx.addColorStop(.07,'#000'); gx.addColorStop(.93,'#000'); gx.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle = gx; x.fillRect(0,0,c.width,c.height);
+  const gy = x.createLinearGradient(0,0,0,c.height);
+  gy.addColorStop(0,'rgba(0,0,0,0)'); gy.addColorStop(.09,'#000'); gy.addColorStop(.91,'#000'); gy.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle = gy; x.fillRect(0,0,c.width,c.height);
+  cutCanvas = c;
+};
+cutImg.src = 'images/stamper.webp';
+
+const CUT_MS = 900;                                              // カットインの長さ
+const easeOut3 = u => 1 - Math.pow(1-u,3);
+const easeIn3  = u => u*u*u;
+
+/* 四方に光が走る「キュピーン」の星 */
+function glint(g,x,y,R,a){
+  g.save();
+  g.translate(x,y);
+  g.globalCompositeOperation = 'lighter';
+  const halo = g.createRadialGradient(0,0,0,0,0,R*0.9);
+  halo.addColorStop(0,`rgba(255,255,255,${0.85*a})`);
+  halo.addColorStop(0.35,`rgba(170,225,255,${0.4*a})`);
+  halo.addColorStop(1,'rgba(120,190,255,0)');
+  g.fillStyle = halo; g.beginPath(); g.arc(0,0,R*0.9,0,Math.PI*2); g.fill();
+  g.fillStyle = `rgba(255,255,255,${a})`;
+  const star = (len,w,rot)=>{
+    g.save(); g.rotate(rot);
+    g.beginPath(); g.moveTo(-len,0); g.quadraticCurveTo(0,-w,len,0); g.quadraticCurveTo(0,w,-len,0); g.fill();
+    g.beginPath(); g.moveTo(0,-len); g.quadraticCurveTo(-w,0,0,len); g.quadraticCurveTo(w,0,0,-len); g.fill();
+    g.restore();
+  };
+  star(R,R*0.1,0);                    // 縦横の長い光
+  star(R*0.55,R*0.07,Math.PI/4);      // 斜めの短い光
+  g.restore();
+}
+
+/* 押印の直前に流れる、印を押すシカーダ星人のカットイン（右から現れて左へ流れる） */
+function drawCutIn(g,lg,dpr,vw,vh,t,lines){
+  // 画面が一瞬で暗くなる → 終わりにかけて、押印演出の暗さへつなぐ
+  const dimEnd = 0.45;
+  let a;
+  if(t < 130) a = 0.82*(t/130);
+  else if(t < CUT_MS-220) a = 0.82;
+  else a = 0.82 - (0.82-dimEnd)*((t-(CUT_MS-220))/220);
+  lg.setTransform(dpr,0,0,dpr,0,0);
+  lg.globalCompositeOperation = 'source-over'; lg.globalAlpha = 1;
+  lg.fillStyle = 'rgb(6,12,40)';
+  lg.fillRect(0,0,vw,vh);
+
+  // 流れる集中線（右→左）
+  lg.save();
+  lg.globalCompositeOperation = 'lighter';
+  lines.forEach(L=>{
+    const x = vw + L.o - L.v*t/1000;
+    if(x + L.len < 0 || x > vw) return;
+    const gr = lg.createLinearGradient(x,0,x+L.len,0);
+    gr.addColorStop(0,'rgba(190,230,255,0)'); gr.addColorStop(1,`rgba(210,240,255,${L.a})`);
+    lg.fillStyle = gr; lg.fillRect(x,L.y,L.len,L.h);
+  });
+  lg.restore();
+
+  // シカーダ星人：高速で入り → ゆっくり流れ → 高速で抜ける
+  const w = Math.min(vw*1.25, vh*1.5, 1000), h = w*cutCanvas.height/cutCanvas.width;
+  const cy = vh*0.42;
+  const xm1 = vw*0.5 + w*0.05, xm2 = vw*0.5 - w*0.05;
+  const T1 = 230, T2 = CUT_MS - 200;
+  let x;
+  if(t < T1)      x = (vw + w*0.5) + (xm1 - (vw + w*0.5))*easeOut3(t/T1);
+  else if(t < T2) x = xm1 + (xm2 - xm1)*((t-T1)/(T2-T1));
+  else            x = xm2 + (-w*0.6 - xm2)*easeIn3((t-T2)/(CUT_MS-T2));
+  lg.save();
+  lg.globalCompositeOperation = 'screen';
+  lg.globalAlpha = Math.min(1, t/90);
+  lg.drawImage(cutCanvas, x-w/2, cy-h/2, w, h);
+  lg.restore();
+
+  // 下地ごと、暗さの度合い a で画面に重ねる
+  g.save();
+  g.setTransform(1,0,0,1,0,0);
+  g.globalAlpha = a;
+  g.drawImage(lg.canvas,0,0);
+  g.restore();
+
+  // キュピーン！（瞳のきらめき）
+  const tS = 330, dS = 300;
+  if(t >= tS && t < tS+dS){
+    const u = (t-tS)/dS, k = Math.sin(Math.PI*u);
+    const ex = x - w/2 + w*0.768, ey = cy - h/2 + h*0.365;
+    glint(g,ex,ey,w*0.17*(0.35+0.65*k),Math.min(1,k*1.4));
+    g.save();
+    g.globalCompositeOperation = 'lighter';
+    const sg = g.createLinearGradient(0,0,vw,0);
+    sg.addColorStop(0,'rgba(255,255,255,0)'); sg.addColorStop(.5,`rgba(220,245,255,${0.7*k})`); sg.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle = sg; g.fillRect(0,ey-1.5,vw,3);                  // 画面を横切る光の筋
+    g.restore();
+  }
+}
+
+/* 押印演出：①カットイン ②画面いっぱいの大きな公印が証明書の上部へ「グワッ」と押される ③着地。
+   演出用の描画は画面全体を覆う別Canvas（#stampFx）で行い、保存画像には含まれない。 */
 function playStamp(id,done){
+  const fx = $('stampFx'), g = fx.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const vw = window.innerWidth, vh = window.innerHeight;
+  fx.width = Math.round(vw*dpr); fx.height = Math.round(vh*dpr);
+  fx.style.display = 'block';
+
+  const cr = $('cert').getBoundingClientRect();
+  const tx = cr.left + state.sealX*(cr.width/W);                 // 押す位置（画面上の座標）
+  const ty = cr.top  + state.sealY*(cr.height/state.H);
+  const D1 = 220*SEAL_K*(cr.width/W);                            // 押印後の大きさ
+  const D0 = Math.max(vw, vh*0.9)*1.2;                           // 最初は画面いっぱい
+  const x0 = vw/2, y0 = vh*0.45;
+
   const rand = mulberry32(state.seed ^ 0x9e3779b1);
-  const parts = Array.from({length:26},()=>({a:rand()*Math.PI*2, v:40+rand()*120, s:1.1+rand()*1.9, l:420+rand()*420}));
-  const wrap = $('certWrap');
+  const parts = Array.from({length:28},()=>({a:rand()*Math.PI*2, v:60+rand()*170, s:1.2+rand()*2.2, l:380+rand()*260}));
+  const lines = Array.from({length:26},()=>({y:rand()*vh, h:1+rand()*2.2, len:140+rand()*320, v:2400+rand()*3200, o:rand()*vw*0.5, a:0.25+rand()*0.5}));
+  const layer = document.createElement('canvas');              // カットイン用の下地レイヤー
+  layer.width = fx.width; layer.height = fx.height;
+  const lg = layer.getContext('2d');
+  const cut = cutCanvas ? CUT_MS : 0;                            // 画像が読み込めていなければカットインを省く
   const t0 = performance.now();
-  let thud = false;
+  let hit = false;
+
+  function end(){ g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,fx.width,fx.height); fx.style.display = 'none'; }
   function frame(now){
-    if(id !== runId) return;
+    if(id !== runId){ end(); return; }
     const t = now - t0;
-    if(t >= STAMP_MS){ compose(FINAL_T,null); done(); return; }
-    compose(t,parts);
-    if(t >= 500 && !thud){
-      thud = true;
-      wrap.classList.remove('thud'); void wrap.offsetWidth; wrap.classList.add('thud');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,vw,vh);
+
+    if(t < cut){                                                 // ① カットイン
+      drawCutIn(g,lg,dpr,vw,vh,t,lines);
+    }else{
+      const ts = t - cut;
+      if(ts < DESC_MS){                                          // ② 降下：ゆっくり始まり、一気に加速
+        const p = ts/DESC_MS, e = p*p*p;
+        g.fillStyle = `rgba(10,24,70,${cut ? 0.45 : 0.45*Math.min(1,p*1.5)})`;   // 画面を少し暗くして印に注目させる
+        g.fillRect(0,0,vw,vh);
+        const D = D0 + (D1-D0)*e, x = x0 + (tx-x0)*e, y = y0 + (ty-y0)*e;
+        g.save();
+        g.translate(x,y); g.rotate(SEAL_ROT + (1-e)*-0.45);
+        g.globalAlpha = SEAL_ALPHA*Math.min(1,p*2.4)*(0.6+0.4*e);
+        g.drawImage(sealCanvas,-D/2,-D/2,D,D);
+        g.restore();
+      }else{                                                     // ③ 着地：揺れ・振動・波紋・粒子
+        const tt = ts - DESC_MS;
+        if(!hit){ hit = true; haptic(); quake(); }
+        compose(tt);
+        if(tt < 300){
+          g.fillStyle = `rgba(10,24,70,${0.45*(1-tt/300)})`; g.fillRect(0,0,vw,vh);
+        }
+        if(tt < 130){
+          g.fillStyle = `rgba(255,255,255,${0.5*(1-tt/130)})`; g.fillRect(0,0,vw,vh);   // 着地の一瞬の閃光
+        }
+        if(tt < 560){
+          const v = tt/560;
+          g.lineWidth = 3; g.strokeStyle = `rgba(201,162,75,${0.7*(1-v)})`;
+          g.beginPath(); g.arc(tx,ty,D1/2 + 5 + D1*1.1*v,0,Math.PI*2); g.stroke();
+          g.lineWidth = 1.5; g.strokeStyle = `rgba(255,255,255,${0.6*(1-v)})`;
+          g.beginPath(); g.arc(tx,ty,D1/2 + 2 + D1*0.6*v,0,Math.PI*2); g.stroke();
+        }
+        parts.forEach(q=>{
+          if(tt >= q.l) return;
+          const d = D1/2 + q.v*tt/1000*1.6;
+          g.fillStyle = `rgba(201,162,75,${0.9*(1-tt/q.l)})`;
+          g.beginPath(); g.arc(tx+Math.cos(q.a)*d, ty+Math.sin(q.a)*d, q.s, 0, Math.PI*2); g.fill();
+        });
+        if(tt >= TAIL_MS){ end(); compose(FINAL_T); done(); return; }
+      }
     }
     requestAnimationFrame(frame);
   }
@@ -1010,7 +1184,7 @@ $('submit').onclick = ()=>{
 
   state = prepare(dateStr, raw.slice(0,MAX_LEN));
   setupCert(state);
-  compose(-1,null);
+  compose(-1);
 
   show('result');
   const id = runId;                                   // show() で更新された最新のID
@@ -1025,7 +1199,7 @@ $('submit').onclick = ()=>{
   };
 
   if(reduceMotion()){                                 // アニメーション無効設定への配慮
-    compose(FINAL_T,null);
+    compose(FINAL_T);
     wrap.classList.add('show');
     finish();
     return;
